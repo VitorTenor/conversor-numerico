@@ -5,6 +5,7 @@ import (
 	"unicode"
 )
 
+// leftPad adds padding to the left of a string until it reaches the desired length
 func leftPad(str, pad string, length int) string {
 	for {
 		if len(str) < length {
@@ -15,6 +16,7 @@ func leftPad(str, pad string, length int) string {
 	}
 }
 
+// normalize converts text to lowercase and removes accents and special characters
 func normalize(s string) string {
 	s = strings.ToLower(s)
 	var b strings.Builder
@@ -40,6 +42,7 @@ func normalize(s string) string {
 	return b.String()
 }
 
+// invertMap creates a reverse mapping from string to int
 func invertMap(m map[int]string) map[string]int {
 	out := make(map[string]int)
 	for k, v := range m {

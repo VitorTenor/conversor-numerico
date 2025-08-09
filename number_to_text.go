@@ -4,11 +4,13 @@ import (
 	"errors"
 	"math"
 	"strconv"
+	"strings"
 )
 
 const maxNumber int64 = 999999999999999999
 const thousandSize int = 3
 
+// NumberToText converts number to written text (in Portuguese)
 func NumberToText(n int64) (string, error) {
 
 	err := checkMaxNumber(n)
@@ -23,6 +25,10 @@ func NumberToText(n int64) (string, error) {
 
 	if n == 0 {
 		return "zero", nil
+	}
+
+	if n == 1000 {
+		return "mil", nil
 	}
 
 	result := ""
@@ -89,19 +95,24 @@ func NumberToText(n int64) (string, error) {
 		}
 	}
 
+	// At the end, remove extra spaces and commas
+	result = strings.TrimSpace(result)
+	result = strings.TrimSuffix(result, ",")
+	result = strings.TrimSuffix(result, " ")
+
 	return result, nil
 }
 
 func checkMaxNumber(n int64) string {
 	if n > maxNumber {
-		return "Número informado maior que o máximo permitido"
+		return "Number exceeds maximum allowed value"
 	}
 	return ""
 }
 
 func checkNegativeNumber(n int64) string {
 	if n < 0 {
-		return "Não é possível escrever números negativos"
+		return "Cannot write negative numbers"
 	}
 	return ""
 }
