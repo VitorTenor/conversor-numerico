@@ -58,3 +58,17 @@ var thousands = []word{
 	{"trilhão", "trilhões"},
 	{"quatrilhão", "quatrilhões"},
 }
+
+var currencyWords = map[string]bool{
+	"real":     true,
+	"reais":    true,
+	"centavo":  true,
+	"centavos": true,
+}
+
+var decimalSeparators = map[string]bool{
+	"virgula": true,
+	"vírgula": true,
+	"ponto":   true,
+	"e":       true,
+}

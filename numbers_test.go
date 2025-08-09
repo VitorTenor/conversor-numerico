@@ -177,3 +177,235 @@ func TestEdgeCases(t *testing.T) {
 		}
 	})
 }
+
+func TestTextToDecimal(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected DecimalResult
+	}{
+		{
+			name:  "monetary value with reais and centavos",
+			input: "cinquenta reais e vinte e cinco centavos",
+			expected: DecimalResult{
+				Integer:    50,
+				Fractional: 25,
+				Decimals:   2,
+			},
+		},
+		{
+			name:  "decimal with vírgula",
+			input: "cinquenta e dois vírgula vinte e cinco",
+			expected: DecimalResult{
+				Integer:    52,
+				Fractional: 25,
+				Decimals:   2,
+			},
+		},
+		{
+			name:  "decimal with ponto",
+			input: "três ponto quatorze",
+			expected: DecimalResult{
+				Integer:    3,
+				Fractional: 14,
+				Decimals:   2,
+			},
+		},
+		{
+			name:  "only reais",
+			input: "cem reais",
+			expected: DecimalResult{
+				Integer:    100,
+				Fractional: 0,
+				Decimals:   2,
+			},
+		},
+		{
+			name:  "only centavos",
+			input: "cinquenta centavos",
+			expected: DecimalResult{
+				Integer:    0,
+				Fractional: 50,
+				Decimals:   2,
+			},
+		},
+		{
+			name:  "integer only",
+			input: "quarenta e dois",
+			expected: DecimalResult{
+				Integer:    42,
+				Fractional: 0,
+				Decimals:   0,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := TextToDecimal(tt.input)
+			if err != nil {
+				t.Errorf("TextToDecimal(%q) returned error: %v", tt.input, err)
+				return
+			}
+
+			if result.Integer != tt.expected.Integer {
+				t.Errorf("TextToDecimal(%q) Integer = %d; want %d", tt.input, result.Integer, tt.expected.Integer)
+			}
+			if result.Fractional != tt.expected.Fractional {
+				t.Errorf("TextToDecimal(%q) Fractional = %d; want %d", tt.input, result.Fractional, tt.expected.Fractional)
+			}
+			if result.Decimals != tt.expected.Decimals {
+				t.Errorf("TextToDecimal(%q) Decimals = %d; want %d", tt.input, result.Decimals, tt.expected.Decimals)
+			}
+		})
+	}
+}
+
+func TestDecimalToText(t *testing.T) {
+	tests := []struct {
+		name     string
+		value    float64
+		monetary bool
+		expected string
+	}{
+		{
+			name:     "monetary value",
+			value:    50.25,
+			monetary: true,
+			expected: "cinquenta reais e vinte e cinco centavos",
+		},
+		{
+			name:     "one real",
+			value:    1.00,
+			monetary: true,
+			expected: "um real",
+		},
+		{
+			name:     "only centavos",
+			value:    0.99,
+			monetary: true,
+			expected: "noventa e nove centavos",
+		},
+		{
+			name:     "one centavo",
+			value:    0.01,
+			monetary: true,
+			expected: "um centavo",
+		},
+		{
+			name:     "decimal with vírgula",
+			value:    52.25,
+			monetary: false,
+			expected: "cinquenta e dois vírgula vinte e cinco",
+		},
+		{
+			name:     "decimal starting with zero",
+			value:    0.75,
+			monetary: false,
+			expected: "zero vírgula setenta e cinco",
+		},
+		{
+			name:     "integer only",
+			value:    42.0,
+			monetary: false,
+			expected: "quarenta e dois",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := DecimalToText(tt.value, tt.monetary)
+			if err != nil {
+				t.Errorf("DecimalToText(%f, %t) returned error: %v", tt.value, tt.monetary, err)
+				return
+			}
+
+			if result != tt.expected {
+				t.Errorf("DecimalToText(%f, %t) = %q; want %q", tt.value, tt.monetary, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestDecimalResult(t *testing.T) {
+	t.Run("ToFloat64", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			decimal  DecimalResult
+			expected float64
+		}{
+			{
+				name: "monetary value",
+				decimal: DecimalResult{
+					Integer:    50,
+					Fractional: 25,
+					Decimals:   2,
+				},
+				expected: 50.25,
+			},
+			{
+				name: "integer only",
+				decimal: DecimalResult{
+					Integer:    42,
+					Fractional: 0,
+					Decimals:   0,
+				},
+				expected: 42.0,
+			},
+			{
+				name: "three decimal places",
+				decimal: DecimalResult{
+					Integer:    3,
+					Fractional: 145,
+					Decimals:   3,
+				},
+				expected: 3.145,
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				result := tt.decimal.ToFloat64()
+				if result != tt.expected {
+					t.Errorf("ToFloat64() = %f; want %f", result, tt.expected)
+				}
+			})
+		}
+	})
+
+	t.Run("ToString", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			decimal  DecimalResult
+			expected string
+		}{
+			{
+				name: "monetary value",
+				decimal: DecimalResult{
+					Integer:    50,
+					Fractional: 25,
+					Decimals:   2,
+				},
+				expected: "50.25",
+			},
+			{
+				name: "integer only",
+				decimal: DecimalResult{
+					Integer:    42,
+					Fractional: 0,
+					Decimals:   0,
+				},
+				expected: "42",
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				result := tt.decimal.ToString()
+				if result != tt.expected {
+					t.Errorf("ToString() = %q; want %q", result, tt.expected)
+				}
+			})
+		}
+	})
+}

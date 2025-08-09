@@ -2,6 +2,7 @@ package numbers
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -10,7 +11,6 @@ import (
 const maxNumber int64 = 999999999999999999
 const thousandSize int = 3
 
-// NumberToText converts number to written text (in Portuguese)
 func NumberToText(n int64) (string, error) {
 
 	err := checkMaxNumber(n)
@@ -101,6 +101,89 @@ func NumberToText(n int64) (string, error) {
 	result = strings.TrimSuffix(result, " ")
 
 	return result, nil
+}
+
+func DecimalToText(value float64, monetary bool) (string, error) {
+	if value < 0 {
+		return "", errors.New("Cannot write negative decimal numbers")
+	}
+
+	integerPart := int64(value)
+	fractionalPart := value - float64(integerPart)
+
+	integerText, err := NumberToText(integerPart)
+	if err != nil {
+		return "", err
+	}
+
+	if fractionalPart == 0 {
+		if monetary {
+			if integerPart == 1 {
+				return integerText + " real", nil
+			}
+			return integerText + " reais", nil
+		}
+		return integerText, nil
+	}
+
+	if monetary {
+		centavos := int64(fractionalPart*100 + 0.5)
+
+		if centavos == 0 {
+			if integerPart == 1 {
+				return integerText + " real", nil
+			}
+			return integerText + " reais", nil
+		}
+
+		centavosText, err := NumberToText(centavos)
+		if err != nil {
+			return "", err
+		}
+
+		var reaisText string
+		if integerPart == 0 {
+			reaisText = ""
+		} else if integerPart == 1 {
+			reaisText = integerText + " real e "
+		} else {
+			reaisText = integerText + " reais e "
+		}
+
+		var centavosUnit string
+		if centavos == 1 {
+			centavosUnit = " centavo"
+		} else {
+			centavosUnit = " centavos"
+		}
+
+		return reaisText + centavosText + centavosUnit, nil
+	} else {
+		fractionalStr := fmt.Sprintf("%.10f", fractionalPart)[2:] // Remove "0."
+		fractionalStr = strings.TrimRight(fractionalStr, "0")     // Remove trailing zeros
+
+		if len(fractionalStr) == 0 {
+			return integerText, nil
+		}
+
+		fractionalInt := int64(0)
+		for _, digit := range fractionalStr {
+			if digit >= '0' && digit <= '9' {
+				fractionalInt = fractionalInt*10 + int64(digit-'0')
+			}
+		}
+
+		fractionalText, err := NumberToText(fractionalInt)
+		if err != nil {
+			return "", err
+		}
+
+		if integerPart == 0 {
+			return "zero vírgula " + fractionalText, nil
+		}
+
+		return integerText + " vírgula " + fractionalText, nil
+	}
 }
 
 func checkMaxNumber(n int64) string {
