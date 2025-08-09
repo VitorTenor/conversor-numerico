@@ -4,10 +4,16 @@ Este projeto é uma biblioteca Go para converter números em texto por extenso (
 
 ## Instalação
 
-Para instalar, utilize o comando:
+Para instalar a versão estável mais recente, utilize o comando:
 
 ```bash
-go get github.com/vitortenor/conversor-numerico/numbers
+go get github.com/vitortenor/conversor-numerico@v1.0.0
+```
+
+Ou para a versão mais recente:
+
+```bash
+go get github.com/vitortenor/conversor-numerico@latest
 ```
 
 ## Uso como biblioteca
