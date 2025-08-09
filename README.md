@@ -18,23 +18,26 @@ go get github.com/vitortenor/conversor-numerico@latest
 
 ## Uso como biblioteca
 
-Importe o pacote `numbers` no seu projeto Go:
+Importe o pacote no seu projeto Go:
 
 ```go
-import "github.com/vitortenor/conversor-numerico/numbers"
+import (
+    "fmt"
+    numbers "github.com/vitortenor/conversor-numerico"
+)
 
 func main() {
     num, err := numbers.TextToNumber("quinhentos e vinte e três mil e onze")
     if err != nil {
         panic(err)
     }
-    fmt.Println(num)
+    fmt.Println(num) // Output: 523011
 
     text, err := numbers.NumberToText(523011)
     if err != nil {
         panic(err)
     }
-    fmt.Println(text)
+    fmt.Println(text) // Output: quinhentos e vinte e três mil e onze
 }
 ```
 
@@ -46,8 +49,7 @@ conversor-numerico/
 ├── text_to_number.go
 ├── types.go
 ├── utils.go
-├── go.mod
-└── .gitignore
+└── go.mod
 ```
 
 ## Contribuição
