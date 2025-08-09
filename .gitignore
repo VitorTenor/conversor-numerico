@@ -1,0 +1,29 @@
+# Arquivos e pastas ignorados pelo Git
+# Binários e executáveis
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Diretórios de dependências
+vendor/
+
+# Arquivos de build
+*.out
+
+# IDEs e editores
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Módulos Go
+/go.sum
+
