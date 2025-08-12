@@ -9,7 +9,7 @@ Transforme palavras em números e números em palavras.
 Para instalar a versão estável mais recente, utilize o comando:
 
 ```bash
-go get github.com/vitortenor/conversor-numerico@v1.0.0
+go get github.com/vitortenor/conversor-numerico@v1.1.0
 ```
 
 Ou para a versão mais recente:
